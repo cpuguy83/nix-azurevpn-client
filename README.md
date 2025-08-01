@@ -19,7 +19,7 @@ Then add the module to your configuration:
 ```nix
 {
   imports = [
-    inputs.azure-vpn.nixosModules.azure-vpn
+    inputs.azure-vpn.nixosModules.azurevpnclient
   ];
 }
 ```
