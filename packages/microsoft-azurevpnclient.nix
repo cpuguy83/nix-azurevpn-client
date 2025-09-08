@@ -82,6 +82,7 @@ Icon=azurevpnclient
 Type=Application
 Categories=Network;
 StartupNotify=true
+StartupWMClass=microsoft-azurevpnclient
 EOF
   '';
 
