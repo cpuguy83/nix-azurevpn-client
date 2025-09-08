@@ -71,10 +71,10 @@ pkgs.stdenv.mkDerivation rec {
       --prefix PATH : "$binPaths"
 
     install -Dm644 extract-root/usr/share/icons/microsoft-azurevpnclient.png \
-      $out/share/icons/hicolor/512x512/apps/azurevpnclient.png
+      $out/share/icons/hicolor/512x512/apps/microsoft-azurevpnclient.png
 
     # Install .desktop file
-    install -Dm644 /dev/stdin $out/share/applications/azurevpnclient.desktop <<EOF
+    install -Dm644 /dev/stdin $out/share/applications/microsoft-azurevpnclient.desktop <<EOF
 [Desktop Entry]
 Name=Azure VPN Client
 Exec=azurevpnclient
