@@ -20,7 +20,7 @@
         })
       );
     in {
-      inherit overlay;
+      overlays.default = overlay;
 
       packages = forAll (pkgs: {
         azurevpnclient = pkgs.microsoft-azurevpnclient;
