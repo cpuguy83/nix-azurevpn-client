@@ -12,7 +12,7 @@ pkgs.stdenv.mkDerivation rec {
   nativeBuildInputs = with pkgs; [
     dpkg
     autoPatchelfHook
-    wrapGAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = with pkgs; [
