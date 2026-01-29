@@ -45,47 +45,70 @@ pkgs.stdenv.mkDerivation rec {
   '';
 
   installPhase = ''
-    # create output directory
-    install -d $out/opt/microsoft/microsoft-azurevpnclient
+        # create output directory
+        install -d $out/opt/microsoft/microsoft-azurevpnclient
 
-    cp -r extract-root/opt/microsoft/microsoft-azurevpnclient/* $out/opt/microsoft/microsoft-azurevpnclient/
+        cp -r extract-root/opt/microsoft/microsoft-azurevpnclient/* $out/opt/microsoft/microsoft-azurevpnclient/
 
-    paths=${lib.makeLibraryPath (with pkgs; [
-      gtk3 glib gcc stdenv.cc.cc.lib libsecret pango atk cairo libepoxy fontconfig freetype harfbuzz
-    ])}
+        paths=${
+          lib.makeLibraryPath (
+            with pkgs;
+            [
+              gtk3
+              glib
+              gcc
+              stdenv.cc.cc.lib
+              libsecret
+              pango
+              atk
+              cairo
+              libepoxy
+              fontconfig
+              freetype
+              harfbuzz
+            ]
+          )
+        }
 
-    binPaths=${lib.makeBinPath (with pkgs;[
-      zenity
-      xdg-utils
-      gtk3
-      glib
-      libsecret
-    ])}
+        binPaths=${
+          lib.makeBinPath (
+            with pkgs;
+            [
+              zenity
+              xdg-utils
+              gtk3
+              glib
+              libsecret
+            ]
+          )
+        }
 
-    patchelf --set-rpath "$paths:$out/opt/microsoft/microsoft-azurevpnclient/lib" \
-      $out/opt/microsoft/microsoft-azurevpnclient/microsoft-azurevpnclient
+        patchelf --set-rpath "$paths:$out/opt/microsoft/microsoft-azurevpnclient/lib" \
+          $out/opt/microsoft/microsoft-azurevpnclient/microsoft-azurevpnclient
 
-    makeWrapper $out/opt/microsoft/microsoft-azurevpnclient/microsoft-azurevpnclient \
-      $out/bin/azurevpnclient \
-      --set LD_LIBRARY_PATH "$paths:$out/opt/microsoft/microsoft-azurevpnclient/lib" \
-      --prefix PATH : "$binPaths"
+        # Unprivileged wrapper - portal file chooser works since no cap_net_admin
+        # The NixOS module wraps this as 'azurevpnclient' with cap_net_admin
+        makeWrapper $out/opt/microsoft/microsoft-azurevpnclient/microsoft-azurevpnclient \
+          $out/bin/azurevpnclient-unprivileged \
+          --set GTK_USE_PORTAL 1 \
+          --set LD_LIBRARY_PATH "$paths:$out/opt/microsoft/microsoft-azurevpnclient/lib" \
+          --prefix PATH : "$binPaths"
 
-    install -Dm644 extract-root/usr/share/icons/microsoft-azurevpnclient.png \
-      $out/share/icons/hicolor/512x512/apps/microsoft-azurevpnclient.png
+        install -Dm644 extract-root/usr/share/icons/microsoft-azurevpnclient.png \
+          $out/share/icons/hicolor/512x512/apps/microsoft-azurevpnclient.png
 
-    # Install .desktop file
-    install -Dm644 /dev/stdin $out/share/applications/microsoft-azurevpnclient.desktop <<EOF
-[Desktop Entry]
-Name=Azure VPN Client
-Exec=azurevpnclient
-Icon=azurevpnclient
-Type=Application
-Categories=Network;
-StartupNotify=true
-StartupWMClass=microsoft-azurevpnclient
-EOF
+        # Install .desktop file
+        install -Dm644 /dev/stdin $out/share/applications/microsoft-azurevpnclient.desktop <<EOF
+    [Desktop Entry]
+    Name=Azure VPN Client
+    Exec=azurevpnclient
+    Icon=azurevpnclient
+    Type=Application
+    Categories=Network;
+    StartupNotify=true
+    StartupWMClass=microsoft-azurevpnclient
+    EOF
   '';
-
 
   meta = with lib; {
     description = "Microsoft Azure VPN Client for Linux (GUI)";

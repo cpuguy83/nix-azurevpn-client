@@ -1,20 +1,26 @@
-{ pkgs, lib, config, ... }:
-let 
-  defaultPkg = (pkgs.microsoft-azurevpnclient
-        or pkgs.callPackage ../packages/microsoft-azurevpnclient.nix { });
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+let
+  defaultPkg = (
+    pkgs.microsoft-azurevpnclient or pkgs.callPackage ../packages/microsoft-azurevpnclient.nix { }
+  );
 in
 {
   options.programs.azurevpnclient = {
     enable = lib.mkEnableOption "Azure VPN Client";
     package = lib.mkOption {
-      type        = lib.types.package;
-      default     = defaultPkg;
+      type = lib.types.package;
+      default = defaultPkg;
       defaultText = lib.literalExpression "pkgs.microsoft-azurevpnclient";
       description = "Derivation to install for Azure VPN Client.";
     };
     polkitGroup = lib.mkOption {
-      type        = lib.types.str;
-      default     = "wheel";
+      type = lib.types.str;
+      default = "wheel";
       description = ''
         Unix group whose members may control systemd-resolved through
         polkit and thus use Azure VPN Client.  Change if you do not use
@@ -28,9 +34,9 @@ in
     services.resolved.enable = true;
 
     security.wrappers.azurevpnclient = lib.mkForce {
-      source       = "${config.programs.azurevpnclient.package}/bin/azurevpnclient";
-      owner        = "root";
-      group        = "root";
+      source = "${config.programs.azurevpnclient.package}/bin/azurevpnclient-unprivileged";
+      owner = "root";
+      group = "root";
       capabilities = "cap_net_admin+eip";
     };
 
